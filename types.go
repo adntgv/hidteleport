@@ -73,3 +73,23 @@ func eventsFromBytesJSON(bz []byte) (hook.Event, error) {
 	err := json.Unmarshal(bz, &evt)
 	return evt, err
 }
+
+type screenSize struct {
+	width  float32
+	height float32
+}
+
+type scaledPosition struct {
+	X float32
+	Y float32
+}
+
+type eventWrapper struct {
+	hook.Event
+	ScaledMousePosition scaledPosition
+}
+
+func (ew eventWrapper) String() string {
+	bz, _ := json.Marshal(ew)
+	return ew.Event.String() + " " + string(bz)
+}

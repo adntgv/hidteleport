@@ -9,7 +9,7 @@ import (
 	hook "github.com/robotn/gohook"
 )
 
-func clientRun(address string) {
+func clientRun(address string, size screenSize) {
 	u := url.URL{Scheme: "ws", Host: address, Path: "/"}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -21,32 +21,25 @@ func clientRun(address string) {
 	log.Printf("conneted to %s", u.String())
 
 	for {
-		/*_, bz, err := c.ReadMessage()
+		evtWpr := eventWrapper{
+			Event:               hook.Event{},
+			ScaledMousePosition: scaledPosition{},
+		}
+		err := c.ReadJSON(&evtWpr)
 		if err != nil {
 			log.Println("ReadMessage:", err)
 			continue
 		}
-		event, err := eventsFromBytesJSON(bz)
-		if err != nil {
-			log.Println("eventsFromBytes:", err)
-			continue
-		}*/
-		event := hook.Event{}
-		err := c.ReadJSON(&event)
-		if err != nil {
-			log.Println("ReadMessage:", err)
-			continue
-		}
-		if err := apply(event); err != nil {
+		if err := apply(evtWpr, size); err != nil {
 			log.Println(err)
 			continue
 		}
 	}
 }
 
-func apply(evt hook.Event) error {
-	log.Println(evt)
-	switch evt.Kind {
+func apply(evtWpr eventWrapper, size screenSize) error {
+	log.Println(evtWpr)
+	switch evtWpr.Kind {
 	// Button, Clicks, X, Y, Amount, Rotation and Direction
 	case hook.MouseDown,
 		hook.MouseUp,
@@ -55,7 +48,10 @@ func apply(evt hook.Event) error {
 		hook.MouseWheel:
 		// stub
 	case hook.MouseMove:
-		robotgo.MoveMouse(int(evt.X), int(evt.Y))
+		robotgo.Move(
+			int(evtWpr.ScaledMousePosition.X*size.width),
+			int(evtWpr.ScaledMousePosition.Y*size.height),
+		)
 
 		// Mask, Keycode, Rawcode, and Keychar,
 		// Keychar is probably what you want.

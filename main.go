@@ -4,6 +4,8 @@ import (
 	"flag"
 	"log"
 	"os"
+
+	"github.com/go-vgo/robotgo"
 )
 
 var (
@@ -20,24 +22,20 @@ func main() {
 			action = "connect"
 		}
 	}
+
+	x, y := robotgo.GetScaleSize()
+
+	size := screenSize{
+		width:  float32(x),
+		height: float32(y),
+	}
+
 	switch action {
 	case "connect":
 		log.Println("connecting to ", *addr)
-		clientRun(*addr)
+		clientRun(*addr, size)
 	default:
 		log.Println("serving on ", *addr)
-		serverRun(*addr)
+		serverRun(*addr, size)
 	}
-}
-
-func detectRunMode(args []string) string {
-	for _, arg := range args {
-		if arg == "serve" {
-			return "server"
-		} else if arg == "connect" {
-			return "client"
-		}
-	}
-
-	return ""
 }

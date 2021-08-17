@@ -11,7 +11,7 @@ import (
 var upgrader = websocket.Upgrader{} // use default options
 var inputEvents = make(chan hook.Event)
 
-func serverRun(address string) {
+func serverRun(address string, size screenSize) {
 	go func(inputEvents chan hook.Event) {
 		EvChan := hook.Start()
 		defer hook.End()
@@ -21,7 +21,7 @@ func serverRun(address string) {
 		}
 	}(inputEvents)
 
-	http.HandleFunc("/", handle)
+	http.HandleFunc("/", getHandler(size))
 	http.HandleFunc("/echo", echo)
 	log.Fatal(http.ListenAndServe(address, nil))
 }
@@ -32,24 +32,26 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handle(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Print("upgrade:", err)
-		return
-	}
-	defer c.Close()
-	for evt := range inputEvents {
-		/*bz, err := eventToBytesJSON(evt)
+func getHandler(size screenSize) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		c, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println("write:", err)
-			continue
+			log.Print("upgrade:", err)
+			return
 		}
-		err = c.WriteMessage(websocket.BinaryMessage, bz)*/
-		err := c.WriteJSON(evt)
-		if err != nil {
-			log.Println("write:", err)
-			break
+		defer c.Close()
+		for evt := range inputEvents {
+			err := c.WriteJSON(eventWrapper{
+				Event: evt,
+				ScaledMousePosition: scaledPosition{
+					X: float32(evt.X) / size.width,
+					Y: float32(evt.Y) / size.height,
+				},
+			})
+			if err != nil {
+				log.Println("write:", err)
+				break
+			}
 		}
 	}
 }
