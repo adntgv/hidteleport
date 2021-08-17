@@ -84,9 +84,15 @@ type scaledPosition struct {
 	Y float32
 }
 
+type delta struct {
+	X int
+	Y int
+}
+
 type eventWrapper struct {
 	hook.Event
 	ScaledMousePosition scaledPosition
+	Delta               delta
 }
 
 func (ew eventWrapper) String() string {

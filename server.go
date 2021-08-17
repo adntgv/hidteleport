@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-vgo/robotgo"
 	"github.com/gorilla/websocket"
 	hook "github.com/robotn/gohook"
 )
@@ -40,18 +41,38 @@ func getHandler(size screenSize) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer c.Close()
+		previous := struct {
+			x int
+			y int
+		}{
+			x: int(size.width / 2),
+			y: int(size.height / 2),
+		}
 		for evt := range inputEvents {
-			err := c.WriteJSON(eventWrapper{
-				Event: evt,
-				ScaledMousePosition: scaledPosition{
-					X: float32(evt.X) / size.width,
-					Y: float32(evt.Y) / size.height,
-				},
-			})
+			dta := delta{
+				X: int(evt.X) - previous.x,
+				Y: int(evt.Y) - previous.y,
+			}
+			if dta.X == 0 && dta.Y == 0 {
+				continue
+			}
+			smp := scaledPosition{
+				X: float32(evt.X) / size.width,
+				Y: float32(evt.Y) / size.height,
+			}
+			wpr := eventWrapper{
+				Event:               evt,
+				ScaledMousePosition: smp,
+				Delta:               dta,
+			}
+			err := c.WriteJSON(wpr)
 			if err != nil {
 				log.Println("write:", err)
 				break
 			}
+			robotgo.Move(previous.x, previous.y)
+			//previous.x = int(evt.X)
+			//previous.y = int(evt.Y)
 		}
 	}
 }

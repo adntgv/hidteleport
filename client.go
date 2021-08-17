@@ -38,7 +38,7 @@ func clientRun(address string, size screenSize) {
 }
 
 func apply(evtWpr eventWrapper, size screenSize) error {
-	log.Println(evtWpr)
+	//log.Println(evtWpr)
 	switch evtWpr.Kind {
 	// Button, Clicks, X, Y, Amount, Rotation and Direction
 	case hook.MouseDown,
@@ -48,10 +48,7 @@ func apply(evtWpr eventWrapper, size screenSize) error {
 		hook.MouseWheel:
 		// stub
 	case hook.MouseMove:
-		robotgo.Move(
-			int(evtWpr.ScaledMousePosition.X*size.width),
-			int(evtWpr.ScaledMousePosition.Y*size.height),
-		)
+		robotgo.MoveRelative(evtWpr.Delta.X, evtWpr.Delta.Y)
 
 		// Mask, Keycode, Rawcode, and Keychar,
 		// Keychar is probably what you want.
