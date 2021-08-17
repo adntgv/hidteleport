@@ -2,20 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 
 	pb "github.com/adntgv/hidteleport/proto"
-	"github.com/gorilla/websocket"
 	hook "github.com/robotn/gohook"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
-)
-
-var (
-	serve       = flag.String("serve", "localhost:8080", "address to serve on")
-	connect     = flag.String("connect", "localhost:8080", "connect to server on specified address")
-	upgrader    = websocket.Upgrader{} // use default options
-	inputEvents = make(chan hook.Event)
 )
 
 func eventToBytesProto(evt hook.Event) ([]byte, error) {

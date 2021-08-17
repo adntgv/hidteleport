@@ -3,17 +3,30 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+)
+
+var (
+	addr = flag.String("addr", "localhost:8080", "address to serve on / connect to")
 )
 
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
 
-	switch detectRunMode(flag.Args()) {
-	case "client":
-		clientRun(*connect)
+	var action string
+	for _, arg := range os.Args {
+		if arg == "connect" {
+			action = "connect"
+		}
+	}
+	switch action {
+	case "connect":
+		log.Println("connecting to ", *addr)
+		clientRun(*addr)
 	default:
-		serverRun(*serve)
+		log.Println("serving on ", *addr)
+		serverRun(*addr)
 	}
 }
 

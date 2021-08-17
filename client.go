@@ -21,7 +21,7 @@ func clientRun(address string) {
 	log.Printf("conneted to %s", u.String())
 
 	for {
-		_, bz, err := c.ReadMessage()
+		/*_, bz, err := c.ReadMessage()
 		if err != nil {
 			log.Println("ReadMessage:", err)
 			continue
@@ -30,8 +30,13 @@ func clientRun(address string) {
 		if err != nil {
 			log.Println("eventsFromBytes:", err)
 			continue
+		}*/
+		event := hook.Event{}
+		err := c.ReadJSON(&event)
+		if err != nil {
+			log.Println("ReadMessage:", err)
+			continue
 		}
-
 		if err := apply(event); err != nil {
 			log.Println(err)
 			continue
@@ -40,6 +45,7 @@ func clientRun(address string) {
 }
 
 func apply(evt hook.Event) error {
+	log.Println(evt)
 	switch evt.Kind {
 	// Button, Clicks, X, Y, Amount, Rotation and Direction
 	case hook.MouseDown,
