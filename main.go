@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,7 +10,9 @@ import (
 )
 
 var (
-	addr = flag.String("addr", "localhost:8080", "address to serve on / connect to")
+	ip      = flag.String("ip", "localhost", "address to serve on / connect to")
+	port    = flag.String("port", "8888", "http port to serve on / connect to")
+	udpport = flag.String("udpport", "8889", "udp port to serve on / connect to")
 )
 
 func main() {
@@ -29,13 +32,14 @@ func main() {
 		width:  float32(x),
 		height: float32(y),
 	}
-
+	addr := fmt.Sprintf("%v:%v", *ip, *port)
+	udpaddr := fmt.Sprintf("%v:%v", *ip, *udpport)
 	switch action {
 	case "connect":
-		log.Println("connecting to ", *addr)
-		clientRun(*addr, size)
+		log.Println("connecting to ", addr)
+		clientRun(addr, udpaddr, size)
 	default:
-		log.Println("serving on ", *addr)
-		serverRun(*addr, size)
+		log.Println("serving on ", addr)
+		serverRun(addr, udpaddr, size)
 	}
 }

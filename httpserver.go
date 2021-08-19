@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/go-vgo/robotgo"
 	"github.com/gorilla/websocket"
@@ -12,7 +14,7 @@ import (
 var upgrader = websocket.Upgrader{} // use default options
 var inputEvents = make(chan hook.Event)
 
-func serverRun(address string, size screenSize) {
+func serverRun(address, udpAddress string, size screenSize) {
 	go func(inputEvents chan hook.Event) {
 		EvChan := hook.Start()
 		defer hook.End()
@@ -21,6 +23,15 @@ func serverRun(address string, size screenSize) {
 			inputEvents <- ev
 		}
 	}(inputEvents)
+
+	go func() {
+		srv := &udpserver{
+			inputDataChan: newDataChan(inputEvents),
+			log:           *log.Default(),
+			lock:          &sync.Mutex{},
+		}
+		srv.serveUDP(udpAddress)
+	}()
 
 	http.HandleFunc("/", getHandler(size))
 	http.HandleFunc("/echo", echo)
@@ -75,4 +86,19 @@ func getHandler(size screenSize) func(w http.ResponseWriter, r *http.Request) {
 			//previous.y = int(evt.Y)
 		}
 	}
+}
+
+func newDataChan(anyChan chan hook.Event) chan []byte {
+	bzChan := make(chan []byte)
+	go func(anyChan chan hook.Event) {
+		for any := range anyChan {
+			bz, err := json.Marshal(any)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			bzChan <- bz
+		}
+	}(anyChan)
+	return bzChan
 }
