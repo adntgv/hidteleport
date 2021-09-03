@@ -13,6 +13,7 @@ var (
 	ip      = flag.String("ip", "localhost", "address to serve on / connect to")
 	port    = flag.String("port", "8888", "http port to serve on / connect to")
 	udpport = flag.String("udpport", "8889", "udp port to serve on / connect to")
+	useUDP  = flag.Bool("udp", true, "should client use UDP connection rather than tcp")
 )
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 	switch action {
 	case "connect":
 		log.Println("connecting to ", addr)
-		clientRun(addr, udpaddr, size)
+		clientRun(addr, udpaddr, *useUDP, size)
 	default:
 		log.Println("serving on ", addr)
 		serverRun(addr, udpaddr, size)
