@@ -1,13 +1,15 @@
 GCC:=x86_64-w64-mingw32-gcc
 GXX:=x86_64-w64-mingw32-g++
+SRC:=./
+OUT:=hidteleport
 
 all: build-wsl-for-win build-wsl-for-lin
 
 build-wsl-for-win:
-	GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=$(GCC) CXX=$(GXX) go build -x ./
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=$(GCC) CXX=$(GXX) go build -x $(SRC)
 
 build-wsl-for-lin:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -x ./
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -x $(SRC)
 
 pb: 
 	protoc \

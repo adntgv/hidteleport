@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"sync"
+
+	"github.com/adntgv/hidteleport/types"
 )
 
 type Client struct {
@@ -13,18 +15,16 @@ type Client struct {
 }
 
 type Config struct {
-	Logger                                                *log.Logger
-	ServerHost, WSServerPath, WSServerPort, UDPServerPort string
-	KeyboardInChan, MouseInChan                           chan []byte
+	types.Config
 }
 
 func NewClient(c *Config) *Client {
-	wsServerAddress := fmt.Sprintf("%v:%v", c.ServerHost, c.WSServerPort)
-	udpServerAddress := fmt.Sprintf("%v:%v", c.ServerHost, c.UDPServerPort)
+	wsServerAddress := fmt.Sprintf("%v:%v", c.Host, c.WSServerPort)
+	udpServerAddress := fmt.Sprintf("%v:%v", c.Host, c.BroadcasterPort)
 	return &Client{
 		Logger:    c.Logger,
-		WSClient:  NewWebSocketClient(c.Logger, wsServerAddress, c.WSServerPath, c.KeyboardInChan),
-		UDPClient: &UDPClient{UDPServerAddress: udpServerAddress, InChan: c.MouseInChan},
+		WSClient:  NewWebSocketClient(c.Logger, wsServerAddress, c.WSServerPath, c.KeyboardChan),
+		UDPClient: &UDPClient{UDPServerAddress: udpServerAddress, InChan: c.MouseChan},
 	}
 }
 

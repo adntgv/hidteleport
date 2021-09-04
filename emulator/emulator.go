@@ -3,14 +3,23 @@ package emulator
 import (
 	"log"
 	"sync"
+
+	"github.com/adntgv/hidteleport/types"
 )
 
 type Emulator struct {
-	logger log.Logger
+	logger *log.Logger
 	Mouse  *Mouse
 }
 
-func (e *Emulator) Run() error {
+func NewEmulator(logger *log.Logger, screen *types.Screen, mouseInChan chan []byte) *Emulator {
+	return &Emulator{
+		logger: logger,
+		Mouse:  NewMouse(logger, screen, mouseInChan),
+	}
+}
+
+func (e *Emulator) Run() {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
@@ -19,6 +28,4 @@ func (e *Emulator) Run() error {
 			e.logger.Println(err)
 		}
 	}(wg)
-
-	return nil
 }

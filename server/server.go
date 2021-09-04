@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"sync"
+
+	"github.com/adntgv/hidteleport/types"
 )
 
 type Server struct {
@@ -13,9 +15,7 @@ type Server struct {
 }
 
 type Config struct {
-	Logger                                            *log.Logger
-	Host, WSServerPort, WSServerPath, BroadcasterPort string
-	WSServerOutChan, BroadcasterOutChan               chan []byte
+	types.Config
 }
 
 func NewServer(c *Config) *Server {
@@ -23,8 +23,8 @@ func NewServer(c *Config) *Server {
 	broadcasterAddress := fmt.Sprintf("%v:%v", c.Host, c.BroadcasterPort)
 	return &Server{
 		logger:      c.Logger,
-		WSServer:    NewWebSocketServer(c.Logger, wsServerAddress, c.WSServerPath, c.WSServerOutChan),
-		Broadcaster: NewBroadcaster(c.Logger, broadcasterAddress, c.BroadcasterOutChan),
+		WSServer:    NewWebSocketServer(c.Logger, wsServerAddress, c.WSServerPath, c.KeyboardChan),
+		Broadcaster: NewBroadcaster(c.Logger, broadcasterAddress, c.MouseChan),
 	}
 }
 
@@ -41,7 +41,7 @@ func (s *Server) Run() {
 
 	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
-		if err := s.WSServer.Run(); err != nil {
+		if err := s.Broadcaster.Run(); err != nil {
 			s.logger.Println(err)
 		}
 	}(wg)
