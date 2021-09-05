@@ -18,7 +18,7 @@ var (
 	host          = flag.String("host", "localhost", "server host address")
 	wsServerPath  = flag.String("path", "/ws", "websocket server path")
 	wsServerPort  = flag.String("ws-port", "8080", "websocket serverport for")
-	udpServerPort = flag.String("udp-port", "8080", "udp server port")
+	udpServerPort = flag.String("udp-port", "8081", "udp server port")
 )
 
 func main() {

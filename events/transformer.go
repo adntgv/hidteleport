@@ -37,9 +37,11 @@ func (t *Transformer) mouseTransform(ev *hook.Event) ([]byte, error) {
 		}
 		msg := &types.MouseEventMessage{
 			Action: types.MouseMoveAction,
-			DX:     int64(t.mousePosition.X) - int64(newPosition.X),
-			DY:     int64(t.mousePosition.Y) - int64(newPosition.Y),
+			DX:     int64(newPosition.X - t.mousePosition.X),
+			DY:     int64(newPosition.Y - t.mousePosition.Y),
 		}
+		t.mousePosition.X = newPosition.X
+		t.mousePosition.Y = newPosition.Y
 		return msg.Bytes()
 	}
 	return nil, nil

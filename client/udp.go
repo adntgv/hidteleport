@@ -7,6 +7,7 @@ import (
 )
 
 type UDPClient struct {
+	logger           *log.Logger
 	UDPServerAddress string
 	InChan           chan []byte
 }
@@ -22,11 +23,11 @@ func (client *UDPClient) Run() error {
 		return fmt.Errorf("dial udp: %v", err)
 	}
 
-	log.Println("udp client connected to", client.UDPServerAddress)
+	client.logger.Println("udp client connected to", client.UDPServerAddress)
 
 	defer connection.Close()
 
-	_, err = connection.WriteToUDP([]byte("hi from "+connection.LocalAddr().String()), s)
+	_, err = connection.Write([]byte("hi from " + connection.LocalAddr().String()))
 	if err != nil {
 		return fmt.Errorf("write: %v", err)
 	}

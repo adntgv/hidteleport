@@ -41,6 +41,10 @@ func (producer *Producer) Run() {
 			producer.logger.Printf("transform: %v", err)
 			continue
 		}
-		producer.OutChans[dev] <- bz
+
+		ch, ok := producer.OutChans[dev]
+		if ok {
+			ch <- bz
+		}
 	}
 }

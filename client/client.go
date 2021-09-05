@@ -24,7 +24,7 @@ func NewClient(c *Config) *Client {
 	return &Client{
 		Logger:    c.Logger,
 		WSClient:  NewWebSocketClient(c.Logger, wsServerAddress, c.WSServerPath, c.KeyboardChan),
-		UDPClient: &UDPClient{UDPServerAddress: udpServerAddress, InChan: c.MouseChan},
+		UDPClient: &UDPClient{UDPServerAddress: udpServerAddress, InChan: c.MouseChan, logger: c.Logger},
 	}
 }
 
