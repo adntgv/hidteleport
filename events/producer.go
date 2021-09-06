@@ -37,7 +37,7 @@ func (producer *Producer) Run() {
 
 	for ev := range EvChan {
 		bz, err, dev := producer.Transformer.Transform(&ev)
-		if err != nil {
+		if err != nil || dev == unknown {
 			producer.logger.Printf("transform: %v", err)
 			continue
 		}

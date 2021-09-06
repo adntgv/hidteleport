@@ -14,8 +14,23 @@ const (
 
 type MouseEventMessage struct {
 	Action MouseAction
-	DX     int64
-	DY     int64
+	DX     float64
+	DY     float64
+}
+
+func NewMouseEventMessage(dx, dy float64) *MouseEventMessage {
+	return &MouseEventMessage{
+		Action: MouseMoveAction,
+		DX:     dx,
+		DY:     dy,
+	}
+}
+
+func (msg *MouseEventMessage) Scale(x, y float64) *MouseEventMessage {
+	msg.DX = msg.DX / x
+	msg.DY = msg.DY / x
+
+	return msg
 }
 
 func FromBytes(bz []byte, m *MouseEventMessage) error {

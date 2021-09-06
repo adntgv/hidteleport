@@ -18,7 +18,10 @@ pb:
  		-I. event.proto
 
 clean:
-	rm -rf ./pb 
+	rm  $(OUT) $(OUT).exe
+
+lint:
+	golangci-lint run
 
 scp:
 	scp $(OUT) aid@192.168.0.192:/home/aid/Downloads/hidteleport

@@ -2,45 +2,59 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"log"
-	"os"
+	"sync"
 
-	"github.com/go-vgo/robotgo"
+	"log"
+
+	"github.com/adntgv/hidteleport/client"
+	"github.com/adntgv/hidteleport/emulator"
+	"github.com/adntgv/hidteleport/events"
+	"github.com/adntgv/hidteleport/server"
+	"github.com/adntgv/hidteleport/types"
 )
 
 var (
-	ip      = flag.String("ip", "localhost", "address to serve on / connect to")
-	port    = flag.String("port", "8888", "http port to serve on / connect to")
-	udpport = flag.String("udpport", "8889", "udp port to serve on / connect to")
-	useUDP  = flag.Bool("udp", true, "should client use UDP connection rather than tcp")
+	mode          = flag.String("mode", "server", "in which mode to run")
+	host          = flag.String("host", "localhost", "server host address")
+	wsServerPath  = flag.String("path", "/ws", "websocket server path")
+	wsServerPort  = flag.String("ws-port", "8080", "websocket serverport for")
+	udpServerPort = flag.String("udp-port", "8081", "udp server port")
 )
 
 func main() {
 	flag.Parse()
-	log.SetFlags(0)
 
-	var action string
-	for _, arg := range os.Args {
-		if arg == "connect" {
-			action = "connect"
-		}
+	logger := log.Default()
+	screen := &types.Screen{} // Needed for absolute mouse positioning
+	wg := &sync.WaitGroup{}
+	keyboardChan := make(chan []byte)
+	mouseChan := make(chan []byte)
+
+	commonConfig := types.Config{
+		Logger:          logger,
+		Host:            *host,
+		WSServerPath:    *wsServerPath,
+		WSServerPort:    *wsServerPort,
+		BroadcasterPort: *udpServerPort,
+		KeyboardChan:    keyboardChan,
+		MouseChan:       mouseChan}
+
+	if *mode == "client" {
+		wg.Add(2)
+		client := client.NewClient(&client.Config{Config: commonConfig})
+		go client.Run()
+
+		emulator := emulator.NewEmulator(logger, screen, mouseChan)
+		go emulator.Run()
+	} else {
+		wg.Add(2)
+		transformer := events.NewTransformer(&types.Coordinates{}, screen)
+		producer := events.NewProducer(transformer, logger, mouseChan, keyboardChan)
+		go producer.Run()
+
+		server := server.NewServer(&server.Config{Config: commonConfig})
+		go server.Run()
 	}
 
-	x, y := robotgo.GetScaleSize()
-
-	size := screenSize{
-		width:  float32(x),
-		height: float32(y),
-	}
-	addr := fmt.Sprintf("%v:%v", *ip, *port)
-	udpaddr := fmt.Sprintf("%v:%v", *ip, *udpport)
-	switch action {
-	case "connect":
-		log.Println("connecting to ", addr)
-		clientRun(addr, udpaddr, *useUDP, size)
-	default:
-		log.Println("serving on ", addr)
-		serverRun(addr, udpaddr, size)
-	}
+	wg.Wait()
 }

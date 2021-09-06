@@ -7,11 +7,13 @@ import (
 
 type Transformer struct {
 	mousePosition *types.Coordinates
+	screen        *types.Screen
 }
 
-func NewTransformer(mouseInitialPosition *types.Coordinates) *Transformer {
+func NewTransformer(mouseInitialPosition *types.Coordinates, screen *types.Screen) *Transformer {
 	return &Transformer{
 		mousePosition: mouseInitialPosition,
+		screen:        screen,
 	}
 }
 
@@ -35,11 +37,15 @@ func (t *Transformer) mouseTransform(ev *hook.Event) ([]byte, error) {
 			X: uint64(ev.X),
 			Y: uint64(ev.Y),
 		}
-		msg := &types.MouseEventMessage{
-			Action: types.MouseMoveAction,
-			DX:     int64(newPosition.X - t.mousePosition.X),
-			DY:     int64(newPosition.Y - t.mousePosition.Y),
-		}
+
+		msg := types.NewMouseEventMessage(
+			float64(newPosition.X-t.mousePosition.X),
+			float64(newPosition.Y-t.mousePosition.Y),
+		).Scale(
+			float64(t.screen.Width),
+			float64(t.screen.Height),
+		)
+
 		t.mousePosition.X = newPosition.X
 		t.mousePosition.Y = newPosition.Y
 		return msg.Bytes()
