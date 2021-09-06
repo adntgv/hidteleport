@@ -1,6 +1,6 @@
 package types
 
 type Coordinates struct {
-	X uint64
-	Y uint64
+	X int64
+	Y int64
 }

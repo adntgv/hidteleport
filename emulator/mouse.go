@@ -14,7 +14,7 @@ type Mouse struct {
 
 func NewMouse(logger *zap.Logger, screen *types.Screen, inChan chan []byte) *Mouse {
 	return &Mouse{
-		logger: logger,
+		logger: logger.Named("mouse"),
 		Screen: screen,
 		InChan: inChan,
 	}
@@ -28,6 +28,7 @@ func (m *Mouse) Run() error {
 			m.logger.Sugar().Error(err)
 			continue
 		}
+		m.logger.Sugar().Debugf("received message %+v", msg)
 		m.Handle(msg)
 	}
 
@@ -42,7 +43,7 @@ func (m *Mouse) Handle(msg *types.MouseEventMessage) {
 }
 
 func (m *Mouse) MoveAbsolute(x, y float64) {
-	robotgo.MoveMouse(m.Screen.ComputePositionAt(x, y))
+	robotgo.MoveMouse(int(x), int(y))
 }
 
 func (m *Mouse) MoveRelative(dx, dy int) {

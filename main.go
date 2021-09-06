@@ -51,7 +51,7 @@ func main() {
 		go emulator.Run()
 	} else {
 		wg.Add(2)
-		transformer := events.NewTransformer(&types.Coordinates{}, screen)
+		transformer := events.NewTransformer(logger, &types.Coordinates{}, screen)
 		producer := events.NewProducer(transformer, logger, mouseChan, keyboardChan)
 		go producer.Run()
 

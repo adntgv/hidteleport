@@ -14,7 +14,7 @@ type Emulator struct {
 
 func NewEmulator(logger *zap.Logger, screen *types.Screen, mouseInChan chan []byte) *Emulator {
 	return &Emulator{
-		logger: logger,
+		logger: logger.Named("emulator"),
 		Mouse:  NewMouse(logger, screen, mouseInChan),
 	}
 }

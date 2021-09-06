@@ -21,7 +21,7 @@ type Producer struct {
 
 func NewProducer(transformer *Transformer, logger *zap.Logger, mouseChan, keyboardChan chan []byte) *Producer {
 	return &Producer{
-		logger:      logger,
+		logger:      logger.Named("producer"),
 		Transformer: transformer,
 		OutChans: map[device]chan []byte{
 			mouse:    mouseChan,

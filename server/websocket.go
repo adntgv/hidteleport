@@ -18,7 +18,7 @@ type WebSocketServer struct {
 
 func NewWebSocketServer(logger *zap.Logger, address, path string, outChan chan []byte) *WebSocketServer {
 	return &WebSocketServer{
-		Logger:  logger,
+		Logger:  logger.Named("wsserver"),
 		Address: address,
 		Path:    path,
 		OutChan: outChan,
