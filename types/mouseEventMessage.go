@@ -28,7 +28,14 @@ func NewMouseEventMessage(dx, dy float64) *MouseEventMessage {
 
 func (msg *MouseEventMessage) Scale(x, y float64) *MouseEventMessage {
 	msg.DX = msg.DX / x
-	msg.DY = msg.DY / x
+	msg.DY = msg.DY / y
+
+	return msg
+}
+
+func (msg *MouseEventMessage) Unscale(x, y float64) *MouseEventMessage {
+	msg.DX = msg.DX * x
+	msg.DY = msg.DY * y
 
 	return msg
 }

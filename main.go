@@ -29,7 +29,7 @@ func main() {
 	wg := &sync.WaitGroup{}
 	keyboardChan := make(chan []byte)
 	mouseChan := make(chan []byte)
-	logger, err := zap.NewDevelopment()
+	logger, err := zap.NewProduction()
 	if err != nil {
 		panic(err)
 	}

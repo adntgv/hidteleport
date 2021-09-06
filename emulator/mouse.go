@@ -7,13 +7,12 @@ import (
 )
 
 type Mouse struct {
-	InChan         chan []byte
-	Screen         *types.Screen
-	logger         *zap.Logger
-	scalingEnabled bool
+	InChan chan []byte
+	Screen *types.Screen
+	logger *zap.Logger
 }
 
-func NewMouse(logger *zap.Logger, screen *types.Screen, inChan chan []byte, scalingEnabled bool) *Mouse {
+func NewMouse(logger *zap.Logger, screen *types.Screen, inChan chan []byte) *Mouse {
 	return &Mouse{
 		logger: logger.Named("mouse"),
 		Screen: screen,
@@ -39,9 +38,7 @@ func (m *Mouse) Run() error {
 func (m *Mouse) Handle(msg *types.MouseEventMessage) {
 	switch msg.Action {
 	case types.MouseMoveAction:
-		if m.scalingEnabled {
-			msg.Unscale(float64(m.Screen.Width), float64(m.Screen.Height))
-		}
+		msg.Unscale(float64(m.Screen.Width), float64(m.Screen.Height))
 		m.MoveRelative(int(msg.DX), int(msg.DY))
 	}
 }
