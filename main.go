@@ -4,7 +4,7 @@ import (
 	"flag"
 	"sync"
 
-	"log"
+	"go.uber.org/zap"
 
 	"github.com/adntgv/hidteleport/client"
 	"github.com/adntgv/hidteleport/emulator"
@@ -24,14 +24,17 @@ var (
 func main() {
 	flag.Parse()
 
-	logger := log.Default()
 	screen := emulator.GetScreenSize() // Needed for absolute mouse positioning
 	wg := &sync.WaitGroup{}
 	keyboardChan := make(chan []byte)
 	mouseChan := make(chan []byte)
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		panic(err)
+	}
 
 	commonConfig := types.Config{
-		Logger:          logger,
+		Logger:          logger.Named("hidteleport"),
 		Host:            *host,
 		WSServerPath:    *wsServerPath,
 		WSServerPort:    *wsServerPort,

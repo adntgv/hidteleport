@@ -1,9 +1,9 @@
 package types
 
-import "log"
+import "go.uber.org/zap"
 
 type Config struct {
-	Logger                                            *log.Logger
+	Logger                                            *zap.Logger
 	Host, WSServerPort, WSServerPath, BroadcasterPort string
 	KeyboardChan, MouseChan                           chan []byte
 }

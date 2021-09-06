@@ -1,13 +1,14 @@
 package server
 
 import (
-	"log"
 	"net"
 	"sync"
+
+	"go.uber.org/zap"
 )
 
 type Broadcaster struct {
-	logger      *log.Logger
+	logger      *zap.Logger
 	Address     string
 	OutChan     chan []byte
 	udpListener *net.UDPConn
@@ -15,7 +16,7 @@ type Broadcaster struct {
 	lock        *sync.Mutex
 }
 
-func NewBroadcaster(logger *log.Logger, address string, outChan chan []byte) *Broadcaster {
+func NewBroadcaster(logger *zap.Logger, address string, outChan chan []byte) *Broadcaster {
 	return &Broadcaster{
 		logger:      logger,
 		Address:     address,
@@ -34,7 +35,7 @@ func (b *Broadcaster) Run() error {
 
 	defer b.udpListener.Close()
 
-	b.logger.Println("serving udp", b.Address)
+	b.logger.Sugar().Infof("serving udp %v", b.Address)
 
 	go b.broadcast()
 
@@ -42,11 +43,11 @@ func (b *Broadcaster) Run() error {
 	for {
 		_, addr, err := b.udpListener.ReadFromUDP(buffer)
 		if err != nil {
-			b.logger.Println(err)
+			b.logger.Sugar().Error(err)
 			continue
 		}
 
-		b.logger.Println("new udp client connected", addr.String(), string(buffer))
+		b.logger.Sugar().Info("new udp client connected", addr.String(), string(buffer))
 		b.addClientAddr(addr)
 	}
 }
@@ -64,7 +65,7 @@ func (b *Broadcaster) broadcast() {
 	for data := range b.OutChan {
 		for _, addr := range b.clientAddrs {
 			if _, err := b.udpListener.WriteToUDP(data, addr); err != nil {
-				b.logger.Println(err)
+				b.logger.Sugar().Error(err)
 				b.removeClientAddr(addr)
 			}
 		}

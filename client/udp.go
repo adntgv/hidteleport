@@ -2,12 +2,13 @@ package client
 
 import (
 	"fmt"
-	"log"
 	"net"
+
+	"go.uber.org/zap"
 )
 
 type UDPClient struct {
-	logger           *log.Logger
+	logger           *zap.Logger
 	UDPServerAddress string
 	InChan           chan []byte
 }
@@ -23,7 +24,7 @@ func (client *UDPClient) Run() error {
 		return fmt.Errorf("dial udp: %v", err)
 	}
 
-	client.logger.Println("udp client connected to", client.UDPServerAddress)
+	client.logger.Sugar().Infof("udp client connected to %v", client.UDPServerAddress)
 
 	defer connection.Close()
 

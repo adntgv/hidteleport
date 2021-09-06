@@ -2,14 +2,14 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"sync"
 
 	"github.com/adntgv/hidteleport/types"
+	"go.uber.org/zap"
 )
 
 type Server struct {
-	logger      *log.Logger
+	logger      *zap.Logger
 	WSServer    *WebSocketServer
 	Broadcaster *Broadcaster
 }
@@ -35,14 +35,14 @@ func (s *Server) Run() {
 	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
 		if err := s.WSServer.Run(); err != nil {
-			s.logger.Println(err)
+			s.logger.Sugar().Error(err)
 		}
 	}(wg)
 
 	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
 		if err := s.Broadcaster.Run(); err != nil {
-			s.logger.Println(err)
+			s.logger.Sugar().Error(err)
 		}
 	}(wg)
 

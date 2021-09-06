@@ -1,9 +1,8 @@
 package events
 
 import (
-	"log"
-
 	hook "github.com/robotn/gohook"
+	"go.uber.org/zap"
 )
 
 type device uint
@@ -15,12 +14,12 @@ const (
 )
 
 type Producer struct {
-	logger      *log.Logger
+	logger      *zap.Logger
 	Transformer *Transformer
 	OutChans    map[device]chan []byte
 }
 
-func NewProducer(transformer *Transformer, logger *log.Logger, mouseChan, keyboardChan chan []byte) *Producer {
+func NewProducer(transformer *Transformer, logger *zap.Logger, mouseChan, keyboardChan chan []byte) *Producer {
 	return &Producer{
 		logger:      logger,
 		Transformer: transformer,
@@ -38,7 +37,7 @@ func (producer *Producer) Run() {
 	for ev := range EvChan {
 		bz, err, dev := producer.Transformer.Transform(&ev)
 		if err != nil || dev == unknown {
-			producer.logger.Printf("transform: %v", err)
+			producer.logger.Sugar().Errorf("transform: %v", err)
 			continue
 		}
 

@@ -1,18 +1,18 @@
 package emulator
 
 import (
-	"log"
 	"sync"
 
 	"github.com/adntgv/hidteleport/types"
+	"go.uber.org/zap"
 )
 
 type Emulator struct {
-	logger *log.Logger
+	logger *zap.Logger
 	Mouse  *Mouse
 }
 
-func NewEmulator(logger *log.Logger, screen *types.Screen, mouseInChan chan []byte) *Emulator {
+func NewEmulator(logger *zap.Logger, screen *types.Screen, mouseInChan chan []byte) *Emulator {
 	return &Emulator{
 		logger: logger,
 		Mouse:  NewMouse(logger, screen, mouseInChan),
@@ -25,7 +25,7 @@ func (e *Emulator) Run() {
 
 	go func(wg *sync.WaitGroup) {
 		if err := e.Mouse.Run(); err != nil {
-			e.logger.Println(err)
+			e.logger.Sugar().Error(err)
 		}
 	}(wg)
 }

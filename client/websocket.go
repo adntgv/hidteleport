@@ -2,20 +2,20 @@ package client
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 )
 
 type WebSocketClient struct {
-	logger          *log.Logger
+	logger          *zap.Logger
 	WSServerAddress string
 	WSServerPath    string
 	InChan          chan []byte
 }
 
-func NewWebSocketClient(logger *log.Logger, wsServerAddress, wsServerPath string, inChan chan []byte) *WebSocketClient {
+func NewWebSocketClient(logger *zap.Logger, wsServerAddress, wsServerPath string, inChan chan []byte) *WebSocketClient {
 	return &WebSocketClient{
 		logger:          logger,
 		WSServerAddress: wsServerAddress,
@@ -33,7 +33,7 @@ func (client *WebSocketClient) Run() error {
 	}
 	defer c.Close()
 
-	client.logger.Printf("conneted to %s", u.String())
+	client.logger.Sugar().Infof("conneted to %s", u.String())
 
 	for {
 		_, bz, err := c.ReadMessage()
@@ -41,7 +41,7 @@ func (client *WebSocketClient) Run() error {
 			if websocket.IsCloseError(err) {
 				return nil
 			}
-			client.logger.Printf("read: %v", err)
+			client.logger.Sugar().Errorf("read: %v", err)
 			continue
 		}
 

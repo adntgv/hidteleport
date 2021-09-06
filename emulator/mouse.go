@@ -1,19 +1,18 @@
 package emulator
 
 import (
-	"log"
-
 	"github.com/adntgv/hidteleport/types"
 	"github.com/go-vgo/robotgo"
+	"go.uber.org/zap"
 )
 
 type Mouse struct {
 	InChan chan []byte
 	Screen *types.Screen
-	logger *log.Logger
+	logger *zap.Logger
 }
 
-func NewMouse(logger *log.Logger, screen *types.Screen, inChan chan []byte) *Mouse {
+func NewMouse(logger *zap.Logger, screen *types.Screen, inChan chan []byte) *Mouse {
 	return &Mouse{
 		logger: logger,
 		Screen: screen,
@@ -26,7 +25,7 @@ func (m *Mouse) Run() error {
 		msg := new(types.MouseEventMessage)
 		err := types.FromBytes(bz, msg)
 		if err != nil {
-			m.logger.Println(err)
+			m.logger.Sugar().Error(err)
 			continue
 		}
 		m.Handle(msg)
