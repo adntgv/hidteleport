@@ -24,6 +24,7 @@ var (
 func main() {
 	flag.Parse()
 
+	scalingEnabled := false
 	screen := emulator.GetScreenSize() // Needed for absolute mouse positioning
 	wg := &sync.WaitGroup{}
 	keyboardChan := make(chan []byte)
@@ -47,11 +48,11 @@ func main() {
 		client := client.NewClient(&client.Config{Config: commonConfig})
 		go client.Run()
 
-		emulator := emulator.NewEmulator(logger, screen, mouseChan)
+		emulator := emulator.NewEmulator(logger, screen, mouseChan, scalingEnabled)
 		go emulator.Run()
 	} else {
 		wg.Add(2)
-		transformer := events.NewTransformer(&types.Coordinates{}, screen)
+		transformer := events.NewTransformer(logger, &types.Coordinates{}, screen)
 		producer := events.NewProducer(transformer, logger, mouseChan, keyboardChan)
 		go producer.Run()
 

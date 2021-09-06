@@ -22,7 +22,7 @@ func NewServer(c *Config) *Server {
 	wsServerAddress := fmt.Sprintf("%v:%v", c.Host, c.WSServerPort)
 	broadcasterAddress := fmt.Sprintf("%v:%v", c.Host, c.BroadcasterPort)
 	return &Server{
-		logger:      c.Logger,
+		logger:      c.Logger.Named("server"),
 		WSServer:    NewWebSocketServer(c.Logger, wsServerAddress, c.WSServerPath, c.KeyboardChan),
 		Broadcaster: NewBroadcaster(c.Logger, broadcasterAddress, c.MouseChan),
 	}

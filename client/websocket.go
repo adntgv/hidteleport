@@ -17,7 +17,7 @@ type WebSocketClient struct {
 
 func NewWebSocketClient(logger *zap.Logger, wsServerAddress, wsServerPath string, inChan chan []byte) *WebSocketClient {
 	return &WebSocketClient{
-		logger:          logger,
+		logger:          logger.Named("wsclient"),
 		WSServerAddress: wsServerAddress,
 		WSServerPath:    wsServerPath,
 		InChan:          inChan,

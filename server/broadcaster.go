@@ -18,7 +18,7 @@ type Broadcaster struct {
 
 func NewBroadcaster(logger *zap.Logger, address string, outChan chan []byte) *Broadcaster {
 	return &Broadcaster{
-		logger:      logger,
+		logger:      logger.Named("broadcaster"),
 		Address:     address,
 		OutChan:     outChan,
 		clientAddrs: make([]*net.UDPAddr, 0),

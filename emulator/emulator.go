@@ -12,9 +12,9 @@ type Emulator struct {
 	Mouse  *Mouse
 }
 
-func NewEmulator(logger *zap.Logger, screen *types.Screen, mouseInChan chan []byte) *Emulator {
+func NewEmulator(logger *zap.Logger, screen *types.Screen, mouseInChan chan []byte, scalingEnabled bool) *Emulator {
 	return &Emulator{
-		logger: logger,
+		logger: logger.Named("emulator"),
 		Mouse:  NewMouse(logger, screen, mouseInChan),
 	}
 }

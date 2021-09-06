@@ -23,7 +23,7 @@ func NewClient(c *Config) *Client {
 	udpServerAddress := fmt.Sprintf("%v:%v", c.Host, c.BroadcasterPort)
 	return &Client{
 		Logger:    c.Logger.Named("client"),
-		WSClient:  NewWebSocketClient(c.Logger.Named("wsclient"), wsServerAddress, c.WSServerPath, c.KeyboardChan),
+		WSClient:  NewWebSocketClient(c.Logger, wsServerAddress, c.WSServerPath, c.KeyboardChan),
 		UDPClient: &UDPClient{logger: c.Logger.Named("udpclient"), UDPServerAddress: udpServerAddress, InChan: c.MouseChan},
 	}
 }

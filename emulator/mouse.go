@@ -7,14 +7,15 @@ import (
 )
 
 type Mouse struct {
-	InChan chan []byte
-	Screen *types.Screen
-	logger *zap.Logger
+	InChan         chan []byte
+	Screen         *types.Screen
+	logger         *zap.Logger
+	scalingEnabled bool
 }
 
-func NewMouse(logger *zap.Logger, screen *types.Screen, inChan chan []byte) *Mouse {
+func NewMouse(logger *zap.Logger, screen *types.Screen, inChan chan []byte, scalingEnabled bool) *Mouse {
 	return &Mouse{
-		logger: logger,
+		logger: logger.Named("mouse"),
 		Screen: screen,
 		InChan: inChan,
 	}
@@ -28,6 +29,7 @@ func (m *Mouse) Run() error {
 			m.logger.Sugar().Error(err)
 			continue
 		}
+		m.logger.Sugar().Debugf("received message %+v", msg)
 		m.Handle(msg)
 	}
 
@@ -37,14 +39,25 @@ func (m *Mouse) Run() error {
 func (m *Mouse) Handle(msg *types.MouseEventMessage) {
 	switch msg.Action {
 	case types.MouseMoveAction:
+		if m.scalingEnabled {
+			msg.Unscale(float64(m.Screen.Width), float64(m.Screen.Height))
+		}
 		m.MoveRelative(int(msg.DX), int(msg.DY))
 	}
 }
 
 func (m *Mouse) MoveAbsolute(x, y float64) {
-	robotgo.MoveMouse(m.Screen.ComputePositionAt(x, y))
+	robotgo.MoveMouse(int(x), int(y))
 }
 
 func (m *Mouse) MoveRelative(dx, dy int) {
 	robotgo.MoveRelative(dx, dy)
+}
+
+func GetMousePosition() *types.Coordinates {
+	x, y := robotgo.GetMousePos()
+	return &types.Coordinates{
+		X: int64(x),
+		Y: int64(y),
+	}
 }
