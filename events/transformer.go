@@ -41,9 +41,6 @@ func (t *Transformer) mouseTransform(ev *hook.Event) ([]byte, error) {
 		msg := types.NewMouseEventMessage(
 			float64(newPosition.X-t.mousePosition.X),
 			float64(newPosition.Y-t.mousePosition.Y),
-		).Scale(
-			float64(t.screen.Width),
-			float64(t.screen.Height),
 		)
 
 		t.mousePosition.X = newPosition.X
