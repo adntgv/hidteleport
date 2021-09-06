@@ -25,7 +25,7 @@ func main() {
 	flag.Parse()
 
 	logger := log.Default()
-	screen := &types.Screen{} // Needed for absolute mouse positioning
+	screen := emulator.GetScreenSize() // Needed for absolute mouse positioning
 	wg := &sync.WaitGroup{}
 	keyboardChan := make(chan []byte)
 	mouseChan := make(chan []byte)
