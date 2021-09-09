@@ -40,6 +40,8 @@ func (m *Mouse) Handle(msg *types.MouseEventMessage) {
 	case types.MouseMoveAction:
 		msg.Unscale(float64(m.Screen.Width), float64(m.Screen.Height))
 		m.MoveRelative(int(msg.DX), int(msg.DY))
+	case types.MouseClickAction:
+		m.Click(msg.Button)
 	}
 }
 
@@ -57,4 +59,8 @@ func GetMousePosition() *types.Coordinates {
 		X: int64(x),
 		Y: int64(y),
 	}
+}
+
+func (m *Mouse) Click(button types.MouseButton) {
+	robotgo.MouseClick(button.String())
 }

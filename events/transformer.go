@@ -56,7 +56,14 @@ func (t *Transformer) mouseTransform(ev *hook.Event) ([]byte, error) {
 		t.mousePosition.X = newPosition.X
 		t.mousePosition.Y = newPosition.Y
 		return msg.Bytes()
+	case hook.MouseUp:
+		msg := types.MouseEventMessage{
+			Action: types.MouseClickAction,
+			Button: types.MouseButton(ev.Button),
+		}
+		return msg.Bytes()
 	}
+
 	return nil, nil
 }
 

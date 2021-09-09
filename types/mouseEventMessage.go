@@ -10,12 +10,37 @@ type MouseAction uint8
 
 const (
 	MouseMoveAction MouseAction = iota
+	MouseClickAction
+	MouseDragAction
 )
+
+type MouseButton uint8
+
+const (
+	NoneMouseButton MouseButton = iota
+	LeftMouseButton
+	RightMouseButton
+	CentralMouseButton
+)
+
+func (btn MouseButton) String() string {
+	switch btn {
+	case LeftMouseButton:
+		return "left"
+	case RightMouseButton:
+		return "right"
+	case CentralMouseButton:
+		return "center"
+	}
+
+	return ""
+}
 
 type MouseEventMessage struct {
 	Action MouseAction
 	DX     float64
 	DY     float64
+	Button MouseButton
 }
 
 func NewMouseEventMessage(dx, dy float64) *MouseEventMessage {
